@@ -1,0 +1,8 @@
+# conda environments:
+#
+# base                     /opt/anaconda3
+# ai_investor_env       *  /opt/anaconda3/envs/ai_investor_env
+# clean-ml                 /opt/anaconda3/envs/clean-ml
+# ml-env                   /opt/anaconda3/envs/ml-env
+# test-env                 /opt/anaconda3/envs/test-env
+
