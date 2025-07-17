@@ -1,22 +1,32 @@
-
-import json
 import re
+import json
 import time
+import torch
 import requests
+from typing import Optional, Dict
 
 SYSTEM_PROMPT = """Answer the following questions as best you can. You have access to the following tools:
 
-analyze_user: Get allocation based on user's surplus and risk
-fetch_interest_rate: Get the current interest rate
-format_allocation: Format asset allocation into a readable string
+Tool 1 = { 
+            Name: analyze_user,
+            Purpose: Get allocation based on user's surplus and risk tolerance,
+            args: {"surplus": {"type": "int"}, "risk": {"type": "string"}}
+        }
+Tool 2 = { 
+            Name: fetch_interest_rate,
+            Purpose: Get the current interest rate,
+            args: {}
+        }
+Tool 3 = { 
+            Name: format_allocation,
+            Purpose: Format asset allocation into a readable string,
+            args: {"weights": {"type": "dict"}}
+        }
 
 The way you use the tools is by specifying a json blob.
-Specifically, this json should have an `action` key (with the name of the tool to use) and an `action_input` key (with the input to the tool going here).
+Specifically, this json should have an `action` key (with its value as the exact name of the tool you want to use) and 
+an `action_input` key (which will contain the arguments for the tool in exact format as shown in above schema).
 
-The only values that should be in the "action" field are:
-analyze_user: Get allocation based on user's surplus and risk, args: {"surplus": {"type": "int"}, "risk": {"type": "string"}}
-fetch_interest_rate: Get the current interest rate, args: {}
-format_allocation: Format asset allocation into a readable string, args: {"weights": {"type": "dict"}}
 example use : 
 
 {{
@@ -25,16 +35,17 @@ example use :
 }}
 
 
-ALWAYS use the following format:
+ALWAYS use the following format while thinking about the answer:
 
 Question: the input question you must answer
 Thought: you should always think about one action to take. Only one action at a time in this format:
-Action:
+Action:{"action": "tool_name", "action_input": {"param": "value"}}
+(Replace with your actual action JSON. Ensure the JSON is a single valid object directly following "Action: ")
 
-$JSON_BLOB (inside markdown cell)
+JSON here in the format shown above as example use.
 
 Observation: the result of the action. This Observation is unique, complete, and the source of truth.
-(this Thought/Action/Observation can repeat N times, you should take several steps when needed. The $JSON_BLOB must be formatted as markdown and only use a SINGLE action at a time.)
+(this Thought/Action/Observation can repeat N times, you should take several steps when needed. Each "Action:" must be followed by a SINGLE valid JSON object.)
 
 You must always end your output with the following format:
 
@@ -45,7 +56,9 @@ Now begin! Reminder to ALWAYS use the exact characters `Final Answer:` when you 
 
 
 # --- Tools ---
-def analyze_user(surplus, risk):
+def analyze_user(action_input_dict: Dict) -> Dict:
+    surplus = action_input_dict.get('surplus')
+    risk = action_input_dict.get('risk')
     score = 0
     if surplus > 50000:
         score += 2
@@ -66,7 +79,7 @@ def analyze_user(surplus, risk):
 
     return {"profile": profile, "weights": weights}
 
-def fetch_interest_rate():
+def fetch_interest_rate(action_input_dict: Dict) -> Dict:
     return {"interest_rate": 6.5}
 
 def format_allocation(weights):
@@ -215,13 +228,36 @@ print("\n✅ Final Answer:\n", final_answer)
 
 from typing import Optional
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from transformers import BitsAndBytesConfig
+from parser import get_json_before_first_observation, remove_after_first_observation, extract_json_from_llm_code_block, extract_action_json
 
 class SmolAgent:
     def __init__(self, model_path):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        if self.device == "cuda":
+            print(f"CUDA version: {torch.version.cuda}")
+            print(f"GPU Name: {torch.cuda.get_device_name(0)}")
         # Load model and tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained(model_path)
-        self.model = AutoModelForCausalLM.from_pretrained(model_path, trust_remote_code=True)
-        self.generator = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer, device='cpu')
+
+        # --- Configure Quantization (NEW) ---
+        # This configuration tells transformers to load the model in 4-bit precision
+        # using the NF4 quantization type with double quantization.
+        bnb_config = BitsAndBytesConfig(
+            load_in_4bit=True,
+            bnb_4bit_use_double_quant=True,
+            bnb_4bit_quant_type="nf4",
+            bnb_4bit_compute_dtype=torch.bfloat16 # Compute dtype for operations (A2 supports bfloat16)
+        )
+
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_path,
+            trust_remote_code=True,
+            quantization_config=bnb_config, # <--- NEW ARGUMENT for 4-bit loading
+            device_map="auto" # Keep device_map="auto" to handle model placement
+        )
+        self.generator = pipeline("text-generation", model=self.model, tokenizer=self.tokenizer)
+
 
     def call_llm(self, prompt: str, stop_tokens=None) -> str:
         stop_tokens = stop_tokens or ["Observation:", "Final Answer:"]
@@ -242,24 +278,46 @@ class SmolAgent:
         return None
 
     def run(self, question: str, tools: dict) -> str:
-        history = f"Question: {question}\n"
+        messages = [
+            {
+                "role": "system",
+                "content": SYSTEM_PROMPT
+            },
+            {"role": "user", "content": question}
+        ]
 
         while True:
-            llm_output = self.call_llm(history)
-            print("\n🤖 LLM Output:\n", llm_output)
-
-            action = self.parse_action(llm_output)
-            if not action:
+            llm_output = self.call_llm(messages)
+            print("=============LLM output==================")
+            for item in llm_output:
+                print(json.dumps(item, indent=2)) # indent=2 makes the JSON output nicely formatted
+                print("-" * 50)
+            tool_json = extract_action_json(llm_output[-1])
+            print("===++++",tool_json,"+++++====")
+            # action = self.parse_action(llm_output[-1])
+            if not tool_json:
                 return llm_output.strip()  # Final answer
-
+            action = tool_json['action']
+            action_input = tool_json['action_input']
             if action not in tools:
                 return f"[ERROR] Unknown tool: {action}"
 
-            observation = tools[action]()  # Run the tool
-            history += f"{llm_output}\nObservation: {observation}\n"
+            observation = tools[action](action_input)  # Run the tool
+            print("=========",observation,'\n')
+            history = remove_after_first_observation(llm_output[-1])
+            print("=========",history,'\n')
+            content1 = history['content']
+            print("=========",content1,'\n',type(content1),'\n')
+            content2 = history['content'] + json.dumps(observation) + '.Thought:'
+            history['content'] = content2
+            print("=========",content2,'\n',type(content2),'\n')
+            print("=========",history,'\n',type(history),'\n')
+            llm_output[-1] = history
+            messages = str(llm_output)
+            print("====messages",messages,'\n')
 
 
-model_path = "llama3.1"  # update this to your actual model folder path
+model_path = "meta-llama/Meta-Llama-3.1-8B-Instruct"  # update this to your actual model folder path
 
 agent = SmolAgent(model_path)
 final_answer = agent.run("How should I invest ₹1,00,000?", tools)
