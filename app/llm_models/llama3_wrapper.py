@@ -38,14 +38,60 @@ def get_llama3_llm():
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=512,
+        max_new_tokens=300,
         do_sample=True,
-        temperature=0.7,
+        temperature=0.3,
         top_p=0.9,
         repetition_penalty=1.1
     )
 
     # Wrap in LangChain LLM interface
+    llm = HuggingFacePipeline(pipeline=pipe)
+
+    return llm
+
+
+def get_mistral_llm():
+    """
+    Loads mistralai/Mistral-7B-Instruct-v0.1 model and wraps it for LangChain usage.
+    Uses 4-bit quantization for efficient memory usage (via bitsandbytes).
+    """
+    model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+    if device == "cuda":
+        print(f"CUDA version: {torch.version.cuda}")
+        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+
+    # 4-bit quantization configuration
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=torch.bfloat16
+    )
+
+    tokenizer = AutoTokenizer.from_pretrained(model_id)
+    model = AutoModelForCausalLM.from_pretrained(
+        model_id,
+        trust_remote_code=True,
+        quantization_config=bnb_config,
+        device_map="auto"
+    )
+
+    # Hugging Face pipeline configuration
+    pipe = pipeline(
+        "text-generation",
+        model=model,
+        tokenizer=tokenizer,
+        max_new_tokens=300,
+        do_sample=False,
+        temperature=0.3,
+        top_p=0.9,
+        repetition_penalty=1.1,
+    )
+
+    # Wrap the pipeline for LangChain
     llm = HuggingFacePipeline(pipeline=pipe)
 
     return llm

@@ -10,7 +10,9 @@ import os
 # Ensure you have accepted the license for THIS SPECIFIC model ID on Hugging Face.
 
 # Example for Llama 3.1 8B Instruct model:
-model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+# model_id = "meta-llama/Meta-Llama-3.1-8B-Instruct"
+model_id = "mistralai/Mistral-7B-Instruct-v0.1"
+
 
 # Example for Llama 3.1 70B Instruct model (requires much more resources!):
 # model_id = "meta-llama/Meta-Llama-3.1-70B-Instruct"

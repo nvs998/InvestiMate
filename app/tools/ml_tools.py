@@ -4,16 +4,17 @@ from langchain.tools import tool
 from pydantic import BaseModel, Field
 
 class AnalyzeUserInput(BaseModel):
-    monthly_income: int = Field(..., description="User's monthly income in INR")
-    monthly_expenses: int = Field(..., description="User's monthly expenses in INR")
+    surplus: int = Field(..., description="User's surplus income after all expenses in INR")
+    # monthly_expenses: int = Field(..., description="User's monthly expenses in INR")
     risk_profile: str = Field(..., description="Risk appetite: low, moderate, high")
 
 @tool(args_schema=AnalyzeUserInput)
-def analyze_user_tool(monthly_income: int, monthly_expenses: int, risk_profile: str) -> dict:
+def analyze_user_tool(surplus: int, risk_profile: str) -> dict:
     """
     Analyze user's financial situation and suggest asset allocation.
     """
-    surplus = monthly_income - monthly_expenses
+    print(f"Running analyze_user_tool with surplus={surplus},{type(surplus)} risk_profile={risk_profile},{type(risk_profile)}")
+    # surplus = monthly_income - monthly_expenses
 
     if risk_profile.lower() == "high":
         allocation = {"equity": 70, "debt": 20, "gold": 10}
