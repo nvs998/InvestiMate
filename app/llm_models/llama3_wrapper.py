@@ -1,7 +1,10 @@
 import torch
 from transformers import BitsAndBytesConfig
-from langchain_community.llms import HuggingFacePipeline
+from langchain_huggingface import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# print(f"Using device: {device}")
 
 def get_llama3_llm():
     """
@@ -61,34 +64,42 @@ def get_mistral_llm():
 
     if device == "cuda":
         print(f"CUDA version: {torch.version.cuda}")
-        print(f"GPU Name: {torch.cuda.get_device_name(0)}")
+        print(f"GPU Name: {torch.cuda.get_device_name(0)}") 
+    else:
+        print("Using CPU device.")
 
     # 4-bit quantization configuration
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
+        device_map="auto",
         bnb_4bit_use_double_quant=True,
         bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.bfloat16
     )
 
     tokenizer = AutoTokenizer.from_pretrained(model_id)
+    inputs = tokenizer("Do you have time", return_tensors="pt").input_ids.to(0)
+    print("Inputs:", inputs)
+    
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         trust_remote_code=True,
         quantization_config=bnb_config,
-        device_map="auto"
+        device_map="cuda:0"
     )
 
+    
     # Hugging Face pipeline configuration
     pipe = pipeline(
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        max_new_tokens=300,
-        do_sample=False,
+        max_new_tokens=1024,
+        do_sample=True,
         temperature=0.3,
         top_p=0.9,
         repetition_penalty=1.1,
+        # device=0 if device == "cuda" else -1
     )
 
     # Wrap the pipeline for LangChain
