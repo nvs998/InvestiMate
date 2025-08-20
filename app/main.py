@@ -53,24 +53,24 @@ class CleanAgentStepCallbackHandler(BaseCallbackHandler):
     def on_agent_action(self, action: AgentAction, **kwargs) -> None:
         """Run on agent action."""
         print("==========================================================================")
-        print(type(action), action)
-        print(f"\n---Thought: {action.log.strip().split('Action:')[0].replace('Thought:', '').strip()}")
-        print(f"---Action: {action.tool}")
-        try:
-            # Attempt to parse action_input as JSON for cleaner display
-            action_input_json = json.dumps(action.tool_input, indent=2)
-            print(f"---Action Input:\n{action_input_json}\n ====action_input_type{type(action.tool_input)}")
-        except TypeError:
-            print(f"---Action Input: {action.tool_input}")
+        # print(type(action), action)
+        # print(f"\n---Thought: {action.log.strip().split('Action:')[0].replace('Thought:', '').strip()}")
+        # print(f"---Action: {action.tool}")
+        # try:
+        #     # Attempt to parse action_input as JSON for cleaner display
+        #     action_input_json = json.dumps(action.tool_input, indent=2)
+        #     print(f"---Action Input:\n{action_input_json}\n ====action_input_type{type(action.tool_input)}")
+        # except TypeError:
+        #     print(f"---Action Input: {action.tool_input}")
 
-    def on_tool_start(self, serialized: dict, input_str: str, run_id: UUID, **kwargs) -> None:
+    def on_tool_start(self, serialized: dict, input_str: str, inputs: dict[str, Any], run_id: UUID, **kwargs) -> None:
         """Run on tool start."""
-        print("which toollll=====",{serialized},"runID==========",{run_id})
+        print("which toollll=====",{json.dumps(serialized)},"runID==========",{run_id}, "=======",{json.dumps(inputs)})
         print(f"--- 📊 Start input for tool:\n{input_str}") # Print raw output for clarity
 
     def on_tool_end(self, output: str, **kwargs) -> None:
         """Run on tool end."""
-        print(f"--- 📊 Observation:\n{output}") # Print raw output for clarity
+        print(f"--- 📊 Observation:\n{str(output)}") # Print raw output for clarity
 
     def on_agent_finish(self, finish: AgentFinish, **kwargs) -> None:
         """Run on agent finish."""
@@ -92,7 +92,7 @@ def main():
         llm = llm,
         tools = tools,
         prompt = prompt,
-        stop_sequence=["\nObservation:"]
+        stop_sequence=["```\nObservation:", "```\n\nObservation:"]
     )
 
     executor = AgentExecutor.from_agent_and_tools(
@@ -100,15 +100,18 @@ def main():
         tools=tools,
         verbose=False,
         handle_parsing_errors=True,
-        callbacks=[CleanAgentStepCallbackHandler()]
+        # callbacks=[CleanAgentStepCallbackHandler()]
     )
 
+    my_callback_handler = CleanAgentStepCallbackHandler()
     # Step 4: Start interaction loop
     try:
         response = executor.invoke({
             "input": "I have ₹60,000 and moderate risk. What should I do?",
             "tool_names": ["analyze_user_tool", "format_allocation_tool"]
-        })
+        },
+        config = { "callbacks": [my_callback_handler] }
+        )
         print(f"\n🤖 Advisor: {response['output']}\n")
     except Exception as e:
         print("❌ An unexpected error occurred while processing your request.")
