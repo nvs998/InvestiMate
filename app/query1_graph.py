@@ -15,11 +15,13 @@ from langgraph.graph.message import add_messages
 # class State(TypedDict, total=False):
 #     messages: Annotated[list, add_messages]
 
+
 class State(TypedDict):
     question: str
     answer: str
     context: Annotated[list, operator.add]
     summary: str
+
 
 # Define the logic to call the model
 def call_model(state: State):
@@ -44,11 +46,11 @@ def search_web(state: State):
 def query_decomposition_tool(state: State):
     # Access arguments directly as passed by Pydantic
     # Use f-strings for formatting and comma for thousands separator
-    return {"context":[
+    return {"context":
         f"Based on the question that user asked, "
         f"We should analyse factors like:\n"
         f"1. Duration for which user plan to hold the investment?\n2. User's convenience and safety.\n3. Taxation.\n4. Costs and Charges"
-    ]}
+    }
 
 def search_wikipedia(state: State):
     search_docs = WikipediaLoader(query=state['question'], load_max_docs=2).load()
