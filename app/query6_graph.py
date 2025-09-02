@@ -58,48 +58,62 @@ def main():
 
         def query_decomposition_tool(state: State):
             return { "pointers" :
-                f"1. Duration for which user plan to hold the investment?\n2. User's convenience and safety.\n3. Taxation.\n4. Costs and Charges"
+                f"1. Exact Down Payment Target.\n2. Current Savings.\n3. Monthly Savings Capacity.\n4. Inflation Expectations.\n5. Potential for Unexpected Expenses."
             }
 
         def rag_search2(state: State):
-            context = '''on behalf of the Government of India. It allows investors to invest in gold in a non-physical form, making it
-            a safer and more eﬃcient alternative to buying physical gold. These bonds are denominated in grams of
-            gold and oﬀer an annual interest rate of 2.50 percent over and above the potential capital gains linked to the
-            market price of gold.
-            One of the key beneﬁts of this scheme is that it eliminates the risks associated with storing physical gold,
-            such as theft or damage. Additionally, it oﬀers tax beneﬁts—especially if the bonds are held till maturity,
-            as the capital gains are tax-free.
-            The upcoming SGB issue under the upcoming Sovereign Gold Bond Scheme for the ﬁnancial year 2024–
-            25 presents a new opportunity for investors to buy these bonds at government-declared rates. It is an
-            ideal option for those looking to diversify their portfolio while beneﬁting from gold’s price appreciation
+            context = '''Recommended Asset Allocation (General Rule of Thumb)
+                        This is based on the age-old 100 minus age rule, adjusted for your goal rather than your age.
+                        Why Equity Should Dominate
+                        Pros:
+                        • Historically, Indian equity returns average 12–15% p.a. over 10 years.
+                        • Ideal for longer horizons: gives you time to ride out market volatility.
+                        • Helps build a bigger corpus faster than debt instruments.
+                        How to Invest:
+                        • SIP in diversiﬁed equity mutual funds (e.g. large-cap, ﬂexi-cap, ELSS if tax saving).
+                        • Consider index funds or ETFs if you want lower cost.
+                        Why Debt Still Matters
+                        Role:
+                        • Adds stability to your portfolio.
+                        • Helps protect capital as you near the goal.
+                        • Rebalances volatility during market downturns.
+                        How to Invest:
+                        • Debt mutual funds (short-term, target maturity funds).
+                        • PPF, EPF (if available), ﬁxed deposits for part of the amount.
+                        Glide Path Strategy (Dynamic Rebalancing)
 
-            Tradability and liquidity: SGBs are tradable on stock exchanges, making them accessible for early
-            exit if required.
-            Small-ticket investment: You can buy as little as one gram of gold, making them suitable for all
-            budgets.
-            Tax beneﬁts: Capital gains are exempt if held till maturity.
-            Collateral for loans: Investors can use SGBs as security when applying for loans.
-            Stay updated on the sovereign gold bond next issue date and plan your investments wisely for the next
-            SGB issue date.
-            Understanding the upcoming sovereign gold bond issues
-            Sovereign Gold Bonds (SGBs) are a smart alternative to buying physical gold, introduced by the
-            Government of India to oﬀer safer, more rewarding investment options. The sovereign gold bond scheme
-            Staying informed about the upcoming SGB dates ensures that you do not miss the opportunity to invest
+                        This ensures your house down payment is protected from late-stage market crashes.
+                        Quick Illustration (₹10,000/month SIP)
+                        *Assuming 12% CAGR for equity and 6% CAGR for debt.
+                        Years Left to 
+                        Goal Equity Debt
+                        10–7 years 70% 30%
+                        6–4 years 60% 40%
+                        3 years left 40% 60%
+                        1–2 years left 20–
+                        30%
+                        70–
+                        80%
+                        Asset Class Monthly 
+                        Allocation
+                        Expected 10Y 
+                        Corpus
+                        Equity 
+                        (70%) ₹7,000/month ₹17–18 lakhs*
+                        Debt (30%) ₹3,000/month ₹5–5.5 lakhs*
+                        Total ₹10,000/month ₹22–23 lakhs
 
-            Tenure: Bonds have a maturity period of 8 years, with an option for premature redemption after 5
-            years.
-            Interest rate: Oﬀers a ﬁxed return of 2.50% per annum, paid semi-annually.
-            Issue price: Based on the average closing price of gold during the preceding week.
-            Eligibility: Open to resident individuals, Hindu Undivided Families (HUFs), trusts, universities, and
-            charitable institutions.
-            Tradability: Bonds are listed and tradable on recognised stock exchanges.
-            Minimum investment: Just 1 gram of gold, making it accessible to small investors.
-            Tax beneﬁts: Capital gains on redemption are exempt from tax if held until maturity.
-            Loan collateral: Bonds can be used as collateral for secured loans.
-            Stay informed about the upcoming sovereign gold bond scheme 2025-26 to make the most of these
-            beneﬁts.
-            Next sovereign gold bond issue date: Important dates to remember'''
-
+                        • PPF, EPF (if available), ﬁxed deposits for part of the amount.
+                        Glide Path Strategy (Dynamic Rebalancing)
+                        As the goal approaches, gradually reduce equity exposure:
+                        Asset 
+                        Class
+                        Suggested 
+                        Allocation Why
+                        Equity 60–70% Higher growth potential over 10 years, can beat 
+                        inﬂation
+                        Debt 30–40% Reduces volatility, provides stability
+                        '''
             return { "context" : context }
 
         def rag_search(state: State):
@@ -131,7 +145,7 @@ def main():
             retriever = vecstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
 
             # Define your query
-            query = "What are the benefits of Sovereign Gold Bonds compared to physical gold?"
+            query = "Should I allocate more to equity or debt in my portfolio if I’m planning to buy a house in 10 years?"
 
             # Search for relevant chunks
             retrieved_docs = vecstore.similarity_search(query, k=3)
@@ -181,7 +195,7 @@ def main():
         # if __name__ == "__main__":
             # Example question you want to test
         initial_state = {
-            "question": "Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?",
+            "question": "Should I allocate more to equity or debt in my portfolio if I’m planning to buy a house in 10 years?",
             "answer": "",
             "context": "",
             "summary": "",
@@ -197,7 +211,7 @@ def main():
         print(result.get("answer"))
 
         # llm2 = get_mistral_llm()
-        normal_answer = llm.invoke('Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?')
+        normal_answer = llm.invoke('Should I allocate more to equity or debt in my portfolio if I’m planning to buy a house in 10 years?')
         print("normal answer===========",normal_answer)
     except Exception as e:
         logger.exception("An error occurred")

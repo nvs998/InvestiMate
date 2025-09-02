@@ -58,48 +58,48 @@ def main():
 
         def query_decomposition_tool(state: State):
             return { "pointers" :
-                f"1. Duration for which user plan to hold the investment?\n2. User's convenience and safety.\n3. Taxation.\n4. Costs and Charges"
+                f"1. Market Indices Performance.\n2. Societal Impact - Impact on Quality of Life/Solving Global Challenges.\n3. Financial Performance - Revenue Growth Rate (Year-over-Year), Profit Margins (Gross, Operating, Net), Market Capitalization Growth, R&D Spending as a Percentage of Revenue, Return on Investment (ROI)."
             }
 
         def rag_search2(state: State):
-            context = '''on behalf of the Government of India. It allows investors to invest in gold in a non-physical form, making it
-            a safer and more eﬃcient alternative to buying physical gold. These bonds are denominated in grams of
-            gold and oﬀer an annual interest rate of 2.50 percent over and above the potential capital gains linked to the
-            market price of gold.
-            One of the key beneﬁts of this scheme is that it eliminates the risks associated with storing physical gold,
-            such as theft or damage. Additionally, it oﬀers tax beneﬁts—especially if the bonds are held till maturity,
-            as the capital gains are tax-free.
-            The upcoming SGB issue under the upcoming Sovereign Gold Bond Scheme for the ﬁnancial year 2024–
-            25 presents a new opportunity for investors to buy these bonds at government-declared rates. It is an
-            ideal option for those looking to diversify their portfolio while beneﬁting from gold’s price appreciation
+            context = '''and regulatory ease, strengthening prospects in UK/an OECD markets The Economic 
+                        Times+1The Economic Times+1.
+                        • Dr. Reddy’s posted record quarterly revenue in Q1 FY26 (+11%) and proﬁt rose modestly 
+                        ~2%, with strong momentum in European generics (up 142%) Wikipedia+15Reuters+15The 
+                        Times of India+15.
+                        Overall, pharma continues to demonstrate consistent earnings growth, resilience in macro 
+                        downturns, and favorable policy tailwinds.
+                        IT Sector: Under Pressure, Mixed Signals 
+                        • The Nifty IT index is down ~14% year-to-date in 2025, making it the worst-performing 
+                        sector so far. Large-cap IT names like TCS, Infosys, and HCL have dropped sharply—TCS 
+                        down ~21%, trading ~30% below its 52-week high India Infoline+1The Economic Times+1.
+                        • Earnings are being squeezed by slowing discretionary spending, macroeconomic headwinds,
 
-            Tradability and liquidity: SGBs are tradable on stock exchanges, making them accessible for early
-            exit if required.
-            Small-ticket investment: You can buy as little as one gram of gold, making them suitable for all
-            budgets.
-            Tax beneﬁts: Capital gains are exempt if held till maturity.
-            Collateral for loans: Investors can use SGBs as security when applying for loans.
-            Stay updated on the sovereign gold bond next issue date and plan your investments wisely for the next
-            SGB issue date.
-            Understanding the upcoming sovereign gold bond issues
-            Sovereign Gold Bonds (SGBs) are a smart alternative to buying physical gold, introduced by the
-            Government of India to oﬀer safer, more rewarding investment options. The sovereign gold bond scheme
-            Staying informed about the upcoming SGB dates ensures that you do not miss the opportunity to invest
+                        Pharmaceutical Sector: Strong and Resilient 
+                        • The Nifty Pharma index rose ~11.5% between July 2024 and June 2025, notably beating 
+                        the Nifty 50 (~5.7%) and most other major sectors 
+                        PwC+15indiamacroindicators.co.in+15The Times of India+15.
+                        • Monthly growth in April 2025 was 7.8% YoY in pharma sales (₹19,711 crore), 
+                        underscoring healthy demand and solid pricing dynamics The Times of India.
+                        • The broader pharmaceutical market grew ~8.4% in FY24-25, driven by chronic therapy 
+                        demand domestically and strong exports from generic makers like Sun Pharma, Cipla, and 
+                        Dr Reddy’s Jainam Broking Ltd+14Business Standard+14Reuters+14.
+                        • The India-UK free trade agreement is likely to boost pharma exports through tariff relief 
+                        and regulatory ease, strengthening prospects in UK/an OECD markets The Economic 
+                        Times+1The Economic Times+1.
 
-            Tenure: Bonds have a maturity period of 8 years, with an option for premature redemption after 5
-            years.
-            Interest rate: Oﬀers a ﬁxed return of 2.50% per annum, paid semi-annually.
-            Issue price: Based on the average closing price of gold during the preceding week.
-            Eligibility: Open to resident individuals, Hindu Undivided Families (HUFs), trusts, universities, and
-            charitable institutions.
-            Tradability: Bonds are listed and tradable on recognised stock exchanges.
-            Minimum investment: Just 1 gram of gold, making it accessible to small investors.
-            Tax beneﬁts: Capital gains on redemption are exempt from tax if held until maturity.
-            Loan collateral: Bonds can be used as collateral for secured loans.
-            Stay informed about the upcoming sovereign gold bond scheme 2025-26 to make the most of these
-            beneﬁts.
-            Next sovereign gold bond issue date: Important dates to remember'''
-
+                        Key Sector Stats
+                        Metric Pharma IT
+                        Index Performance 
+                        (1 yr) 11.5% –14% (Nifty IT YTD)
+                        Sales Growth FY25 ~8–8.4% ~3–5%
+                        Earnings Trend Positive, steady Weak, margin pressure
+                        Export Momentum Rising (US, UK futures) Mixed – some growth, some headwinds
+                        Outlook Stable growth + 
+                        tailwinds
+                        Under stress; cautious medium-term 
+                        outlook
+                        '''
             return { "context" : context }
 
         def rag_search(state: State):
@@ -131,7 +131,7 @@ def main():
             retriever = vecstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
 
             # Define your query
-            query = "What are the benefits of Sovereign Gold Bonds compared to physical gold?"
+            query = "Which sector is doing better in 2025 – pharma or IT?"
 
             # Search for relevant chunks
             retrieved_docs = vecstore.similarity_search(query, k=3)
@@ -181,7 +181,7 @@ def main():
         # if __name__ == "__main__":
             # Example question you want to test
         initial_state = {
-            "question": "Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?",
+            "question": "Which sector is doing better in 2025 – pharma or IT?",
             "answer": "",
             "context": "",
             "summary": "",
@@ -197,7 +197,7 @@ def main():
         print(result.get("answer"))
 
         # llm2 = get_mistral_llm()
-        normal_answer = llm.invoke('Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?')
+        normal_answer = llm.invoke('Which sector is doing better in 2025 – pharma or IT?')
         print("normal answer===========",normal_answer)
     except Exception as e:
         logger.exception("An error occurred")

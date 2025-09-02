@@ -1,0 +1,32 @@
+2025-09-02 17:45:30,058 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 17:45:30,058 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 17:45:31,614 [INFO] Investimate: Starting program
+2025-09-02 17:45:51,190 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-02 17:51:36,648 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 17:51:36,648 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 17:51:37,849 [INFO] Investimate: Starting program
+2025-09-02 17:51:57,183 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-02 18:16:38,320 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 18:16:38,320 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 18:16:39,584 [INFO] Investimate: Starting program
+2025-09-02 18:16:40,788 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-02 18:22:28,864 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 18:22:28,864 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 18:22:30,160 [INFO] Investimate: Starting program
+2025-09-02 18:22:31,422 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-02 18:27:28,155 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 18:27:28,155 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 18:27:29,437 [INFO] Investimate: Starting program
+2025-09-02 18:27:30,678 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-02 18:29:53,215 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 18:29:53,215 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 18:29:54,572 [INFO] Investimate: Starting program
+2025-09-02 18:29:55,845 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-02 19:17:03,669 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 19:17:03,670 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 19:17:04,897 [INFO] Investimate: Starting program
+2025-09-02 19:17:06,096 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).
+2025-09-02 19:24:27,276 [INFO] numexpr.utils: Note: NumExpr detected 64 cores but "NUMEXPR_MAX_THREADS" not set, so enforcing safe limit of 16.
+2025-09-02 19:24:27,276 [INFO] numexpr.utils: NumExpr defaulting to 16 threads.
+2025-09-02 19:24:28,456 [INFO] Investimate: Starting program
+2025-09-02 19:24:29,634 [INFO] accelerate.utils.modeling: We will use 90% of the memory on device 0 for storing the model, and 10% for the buffer to avoid OOM. You can set `max_memory` in to a higher value to use more memory (at your own risk).

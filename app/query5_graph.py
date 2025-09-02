@@ -58,55 +58,61 @@ def main():
 
         def query_decomposition_tool(state: State):
             return { "pointers" :
-                f"1. Duration for which user plan to hold the investment?\n2. User's convenience and safety.\n3. Taxation.\n4. Costs and Charges"
+                f"1. Investment Goal.\n2. Risk Appetite.\n3. Liquidity Requirements.\n4. Expense Ratio (for ELSS) and Brokerage/Transaction Costs (for Direct Stocks)."
             }
 
         def rag_search2(state: State):
-            context = '''on behalf of the Government of India. It allows investors to invest in gold in a non-physical form, making it
-            a safer and more eﬃcient alternative to buying physical gold. These bonds are denominated in grams of
-            gold and oﬀer an annual interest rate of 2.50 percent over and above the potential capital gains linked to the
-            market price of gold.
-            One of the key beneﬁts of this scheme is that it eliminates the risks associated with storing physical gold,
-            such as theft or damage. Additionally, it oﬀers tax beneﬁts—especially if the bonds are held till maturity,
-            as the capital gains are tax-free.
-            The upcoming SGB issue under the upcoming Sovereign Gold Bond Scheme for the ﬁnancial year 2024–
-            25 presents a new opportunity for investors to buy these bonds at government-declared rates. It is an
-            ideal option for those looking to diversify their portfolio while beneﬁting from gold’s price appreciation
+            context = '''Side-by-Side Comparison
+                        When to Choose What?
+                        Choose ELSS Funds if:
+                        • You want tax savings under Section 80C.
+                        • You’re not an expert in stock picking.
+                        • You prefer diversiﬁed risk with long-term compounding.
+                        • You’re starting with small amounts via SIP (e.g. ₹5,000/month).
+                        • You want a set-it-and-forget-it approach for 3–5+ years.
+                        Choose Blue-Chip Stocks if:
+                        • You’re conﬁdent in evaluating stocks and sectors.
+                        • You want full control over what you own.
+                        • You’re building a custom long-term portfolio.
+                        • You’re okay with market cycles and monitoring regularly.
+                        • You don’t need Section 80C deductions or already maxed them out.
+                        Feature ELSS Mutual Funds Blue-Chip Stocks (Direct Investment)
+                        Tax Beneﬁts
+                        ✅  Up to ₹1.5L under Section 80C
+                        ❌  No tax beneﬁt
+                        Lock-in Period 3 years (mandatory) No lock-in
+                        Returns Potential 10–14% historically (managed 
+                        portfolio)
+                        8–15%+ (if picked & timed well)
 
-            Tradability and liquidity: SGBs are tradable on stock exchanges, making them accessible for early
-            exit if required.
-            Small-ticket investment: You can buy as little as one gram of gold, making them suitable for all
-            budgets.
-            Tax beneﬁts: Capital gains are exempt if held till maturity.
-            Collateral for loans: Investors can use SGBs as security when applying for loans.
-            Stay updated on the sovereign gold bond next issue date and plan your investments wisely for the next
-            SGB issue date.
-            Understanding the upcoming sovereign gold bond issues
-            Sovereign Gold Bonds (SGBs) are a smart alternative to buying physical gold, introduced by the
-            Government of India to oﬀer safer, more rewarding investment options. The sovereign gold bond scheme
-            Staying informed about the upcoming SGB dates ensures that you do not miss the opportunity to invest
+                        stream.
+                        • Liquidity: Blue-chip stocks are highly liquid, meaning they can be easily bought and sold in 
+                        the market.
+                        • Direct Control: You have full control over your investment decisions, allowing you to pick 
+                        speciﬁc companies you believe in.
+                        • Transparency: Financial information and performance of blue-chip companies are 
+                        generally well-documented and easily accessible.
+                        • No Expense Ratio: You don't pay an expense ratio like with mutual funds.
+                        Drawbacks:
+                        • No 80C Tax Beneﬁt: Investing in blue-chip stocks directly does not provide any tax 
+                        deduction under Section 80C.
+                        • Concentration Risk: Investing in a few blue-chip stocks directly exposes you to higher 
+                        concentration risk compared to a diversiﬁed mutual fund. If one of your chosen 
+                        stocks underperforms signiﬁcantly, it can have a larger impact on your portfolio.
 
-            Tenure: Bonds have a maturity period of 8 years, with an option for premature redemption after 5
-            years.
-            Interest rate: Oﬀers a ﬁxed return of 2.50% per annum, paid semi-annually.
-            Issue price: Based on the average closing price of gold during the preceding week.
-            Eligibility: Open to resident individuals, Hindu Undivided Families (HUFs), trusts, universities, and
-            charitable institutions.
-            Tradability: Bonds are listed and tradable on recognised stock exchanges.
-            Minimum investment: Just 1 gram of gold, making it accessible to small investors.
-            Tax beneﬁts: Capital gains on redemption are exempt from tax if held until maturity.
-            Loan collateral: Bonds can be used as collateral for secured loans.
-            Stay informed about the upcoming sovereign gold bond scheme 2025-26 to make the most of these
-            beneﬁts.
-            Next sovereign gold bond issue date: Important dates to remember'''
-
+                        🔧 Sample Strategy
+                        For long-term wealth creation, many investors combine both:
+                        • 60–70% in ELSS (or large-cap funds) to get tax beneﬁt + diversiﬁcation.
+                        • 30–40% in handpicked blue-chip stocks to participate in speciﬁc sectoral stories (e.g. IT, 
+                        banking, FMCG).
+                        '''
             return { "context" : context }
 
         def rag_search(state: State):
             # 1) Load your PDFs
             pdf_paths = [
-                "../query1_data/Gold ETF vs Physical Gold.pdf",
-                "../query1_data/Sovereign Gold Bond Scheme 2025-26.pdf"
+                "../query5_data/ELSS vs Blue chip.pdf",
+                "../query5_data/ELSS vs Blue chip2.pdf"
             ]
 
             docs = []
@@ -131,7 +137,7 @@ def main():
             retriever = vecstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
 
             # Define your query
-            query = "What are the benefits of Sovereign Gold Bonds compared to physical gold?"
+            query = "Which is better for long-term wealth: investing in ELSS funds or in blue-chip stocks directly?"
 
             # Search for relevant chunks
             retrieved_docs = vecstore.similarity_search(query, k=3)
@@ -181,7 +187,7 @@ def main():
         # if __name__ == "__main__":
             # Example question you want to test
         initial_state = {
-            "question": "Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?",
+            "question": "Which is better for long-term wealth: investing in ELSS funds or in blue-chip stocks directly?",
             "answer": "",
             "context": "",
             "summary": "",
@@ -197,7 +203,7 @@ def main():
         print(result.get("answer"))
 
         # llm2 = get_mistral_llm()
-        normal_answer = llm.invoke('Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?')
+        normal_answer = llm.invoke('Which is better for long-term wealth: investing in ELSS funds or in blue-chip stocks directly?')
         print("normal answer===========",normal_answer)
     except Exception as e:
         logger.exception("An error occurred")

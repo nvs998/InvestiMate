@@ -58,48 +58,43 @@ def main():
 
         def query_decomposition_tool(state: State):
             return { "pointers" :
-                f"1. Duration for which user plan to hold the investment?\n2. User's convenience and safety.\n3. Taxation.\n4. Costs and Charges"
+                f"1. Profitability.\n2. Revenue Growth (Sales).\n3. Valuation Metrics.\n4. Debt and Liquidity."
             }
 
         def rag_search2(state: State):
-            context = '''on behalf of the Government of India. It allows investors to invest in gold in a non-physical form, making it
-            a safer and more eﬃcient alternative to buying physical gold. These bonds are denominated in grams of
-            gold and oﬀer an annual interest rate of 2.50 percent over and above the potential capital gains linked to the
-            market price of gold.
-            One of the key beneﬁts of this scheme is that it eliminates the risks associated with storing physical gold,
-            such as theft or damage. Additionally, it oﬀers tax beneﬁts—especially if the bonds are held till maturity,
-            as the capital gains are tax-free.
-            The upcoming SGB issue under the upcoming Sovereign Gold Bond Scheme for the ﬁnancial year 2024–
-            25 presents a new opportunity for investors to buy these bonds at government-declared rates. It is an
-            ideal option for those looking to diversify their portfolio while beneﬁting from gold’s price appreciation
+            context = '''Sky+4website+4Value Research Online+4Reuters.
+                        However, consider these before switching:
+                        • Valuation: Asian Paints and Berger have traditionally traded at high P/E and P/B multiples; 
+                        check trailing ratios and growth forecasts.
+                        • Long-term brand strength: Asian Paints still has deeper pan-India reach and premium 
+                        brand equity.
+                        • Upcoming Q1 FY26 results (Asian Paints on July 29, Berger on August 5) will provide 
+                        updated guidance and may shift the momentum pattern Reuters+11HDFC 
+                        Sky+11BlinkX+11Reuters.
+                        ✅ Bottom Line
+                        If your decision is based on recent fundamentals and growth trajectory, Berger Paints 
+                        currently appears the stronger choice. They posted consistent growth, delivered better margins, 
+                        and beneﬁted from a robust industrial segment.
+                        Asian Paints, while still a market leader, is grappling with weak demand, eroding share, and
 
-            Tradability and liquidity: SGBs are tradable on stock exchanges, making them accessible for early
-            exit if required.
-            Small-ticket investment: You can buy as little as one gram of gold, making them suitable for all
-            budgets.
-            Tax beneﬁts: Capital gains are exempt if held till maturity.
-            Collateral for loans: Investors can use SGBs as security when applying for loans.
-            Stay updated on the sovereign gold bond next issue date and plan your investments wisely for the next
-            SGB issue date.
-            Understanding the upcoming sovereign gold bond issues
-            Sovereign Gold Bonds (SGBs) are a smart alternative to buying physical gold, introduced by the
-            Government of India to oﬀer safer, more rewarding investment options. The sovereign gold bond scheme
-            Staying informed about the upcoming SGB dates ensures that you do not miss the opportunity to invest
+                        Berger Paints is demonstrating stronger momentum right now:
+                        • More resilient revenue and proﬁt growth amid broader industry softness.
+                        • Industrial segment strength provides diversiﬁcation beyond consumer paints.
+                        • Superior execution on cost and margins in a challenging macro environment.
+                        Asian Paints is facing serious headwinds:
+                        • Sharp earnings decline in Q4.
+                        • Loss of market share to aggressive competitors like Birla Opus.
+                        • Higher operating and marketing spend, leading to margin compression Wikipedia+15The 
+                        Economic Times+15website+15HDFC Sky+3Screener+3The Economic Times+3Perplexity 
+                        AI+2HDFC Sky+2Value Research Online+2Trendlyne.comyoutube.com+4Reuters+4HDFC 
+                        Sky+4Perplexity AI+7Reuters+7HDFC Sky+7Reuters+1Reuters+1HDFC 
+                        Sky+4website+4Value Research Online+4Reuters.
+                        However, consider these before switching:
 
-            Tenure: Bonds have a maturity period of 8 years, with an option for premature redemption after 5
-            years.
-            Interest rate: Oﬀers a ﬁxed return of 2.50% per annum, paid semi-annually.
-            Issue price: Based on the average closing price of gold during the preceding week.
-            Eligibility: Open to resident individuals, Hindu Undivided Families (HUFs), trusts, universities, and
-            charitable institutions.
-            Tradability: Bonds are listed and tradable on recognised stock exchanges.
-            Minimum investment: Just 1 gram of gold, making it accessible to small investors.
-            Tax beneﬁts: Capital gains on redemption are exempt from tax if held until maturity.
-            Loan collateral: Bonds can be used as collateral for secured loans.
-            Stay informed about the upcoming sovereign gold bond scheme 2025-26 to make the most of these
-            beneﬁts.
-            Next sovereign gold bond issue date: Important dates to remember'''
-
+                        and beneﬁted from a robust industrial segment.
+                        Asian Paints, while still a market leader, is grappling with weak demand, eroding share, and 
+                        margin pressure—making it less compelling in the near term.
+                        '''
             return { "context" : context }
 
         def rag_search(state: State):
@@ -131,7 +126,7 @@ def main():
             retriever = vecstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
 
             # Define your query
-            query = "What are the benefits of Sovereign Gold Bonds compared to physical gold?"
+            query = "Should I switch from Asian Paints to Berger Paints based on recent quarterly results?"
 
             # Search for relevant chunks
             retrieved_docs = vecstore.similarity_search(query, k=3)
@@ -181,7 +176,7 @@ def main():
         # if __name__ == "__main__":
             # Example question you want to test
         initial_state = {
-            "question": "Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?",
+            "question": "Should I switch from Asian Paints to Berger Paints based on recent quarterly results?",
             "answer": "",
             "context": "",
             "summary": "",
@@ -197,7 +192,7 @@ def main():
         print(result.get("answer"))
 
         # llm2 = get_mistral_llm()
-        normal_answer = llm.invoke('Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?')
+        normal_answer = llm.invoke('Should I switch from Asian Paints to Berger Paints based on recent quarterly results?')
         print("normal answer===========",normal_answer)
     except Exception as e:
         logger.exception("An error occurred")

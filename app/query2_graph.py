@@ -58,48 +58,53 @@ def main():
 
         def query_decomposition_tool(state: State):
             return { "pointers" :
-                f"1. Duration for which user plan to hold the investment?\n2. User's convenience and safety.\n3. Taxation.\n4. Costs and Charges"
+                f"1. Current Dividend Yield.\n2. Dividend Payout Ratio.\n3. Company Financial Health and Stability."
             }
 
         def rag_search2(state: State):
-            context = '''on behalf of the Government of India. It allows investors to invest in gold in a non-physical form, making it
-            a safer and more eﬃcient alternative to buying physical gold. These bonds are denominated in grams of
-            gold and oﬀer an annual interest rate of 2.50 percent over and above the potential capital gains linked to the
-            market price of gold.
-            One of the key beneﬁts of this scheme is that it eliminates the risks associated with storing physical gold,
-            such as theft or damage. Additionally, it oﬀers tax beneﬁts—especially if the bonds are held till maturity,
-            as the capital gains are tax-free.
-            The upcoming SGB issue under the upcoming Sovereign Gold Bond Scheme for the ﬁnancial year 2024–
-            25 presents a new opportunity for investors to buy these bonds at government-declared rates. It is an
-            ideal option for those looking to diversify their portfolio while beneﬁting from gold’s price appreciation
+            context = '''Sign InCompanies: 10,582 total market cap: $127.029 T
+                        Market cap Revenue Earnings Dividend yield
+                        Dividend yield history for Oil & Natural Gas
+                        (ONGC.NS)
+                        Oil & Natural Gas (stock symbol: ONGC.NS) dividend yield (TTM) as of July 26, 2025 : 5.66%
+                        Average dividend yield, last 5 years: 5.51%
+                        🇺🇸  English $ USD 
+                        Company name, ticker...
+                        Oil & Natural Gas 
+                        O N G C .N S
+                        🛢  Oil&Gas⚡  Energy
+                        Categories
+                        #647
+                        Rank
+                        $34.96 B
+                        Marketcap
+                        🇮🇳 India
+                        Country
+                        $2.78
+                        Share price
+                        -1.85%
+                        Change (1 day)
+                        -30.69%
+                        Change (1 year)
+                        Oil and Natural Gas Corporation or ONGC for short, is an Indian Multinational Crude Oil
+                        and Gas Corporation. ONGC's operations include conventional exploration and production,
+                        refining and progressive development of alternate energy sources like coal-bed methane
+                        and shale gas.
+                        More
+                        26/07/2025, 21:33 Oil & Natural Gas (ONGC.NS) - Dividend Yield
 
-            Tradability and liquidity: SGBs are tradable on stock exchanges, making them accessible for early
-            exit if required.
-            Small-ticket investment: You can buy as little as one gram of gold, making them suitable for all
-            budgets.
-            Tax beneﬁts: Capital gains are exempt if held till maturity.
-            Collateral for loans: Investors can use SGBs as security when applying for loans.
-            Stay updated on the sovereign gold bond next issue date and plan your investments wisely for the next
-            SGB issue date.
-            Understanding the upcoming sovereign gold bond issues
-            Sovereign Gold Bonds (SGBs) are a smart alternative to buying physical gold, introduced by the
-            Government of India to oﬀer safer, more rewarding investment options. The sovereign gold bond scheme
-            Staying informed about the upcoming SGB dates ensures that you do not miss the opportunity to invest
+                        and shale gas.
+                        More
+                        26/07/2025, 21:33 Oil & Natural Gas (ONGC.NS) - Dividend Yield
 
-            Tenure: Bonds have a maturity period of 8 years, with an option for premature redemption after 5
-            years.
-            Interest rate: Oﬀers a ﬁxed return of 2.50% per annum, paid semi-annually.
-            Issue price: Based on the average closing price of gold during the preceding week.
-            Eligibility: Open to resident individuals, Hindu Undivided Families (HUFs), trusts, universities, and
-            charitable institutions.
-            Tradability: Bonds are listed and tradable on recognised stock exchanges.
-            Minimum investment: Just 1 gram of gold, making it accessible to small investors.
-            Tax beneﬁts: Capital gains on redemption are exempt from tax if held until maturity.
-            Loan collateral: Bonds can be used as collateral for secured loans.
-            Stay informed about the upcoming sovereign gold bond scheme 2025-26 to make the most of these
-            beneﬁts.
-            Next sovereign gold bond issue date: Important dates to remember'''
-
+                        Home ETPrimeMarkets Market Data
+                        NewsIndustrySMEPoliticsWealthMFTechAI CareersOpinionNRI Panache ••
+                        Stocks Options IPOs/FPOs Expert Views Investment Ideas Commodities Forex Live Stream! AIF PMS Crypto Bonds More
+                        Business News›Markets›Stocks›Earnings›Coal India Q4 Results: Profit rises 12% YoY to Rs 9,593 crore; Co declares Rs 5.15 per share as final dividend for FY25 
+                        Coal India Q4 Results: Profit rises 12% YoY to Rs9,593 crore; Co declares Rs 5.15 per share as finaldividend for FY25
+                        Vijay Shekhar Sharma’s resilience fuels the rise ofIndia’s merchant payments champion
+                        SynopsisCoal India Q4 Results: State-owned Coal India on Wednesday reported 12 percent growth in itsconsolidated net profit at Rs 9,593 crore in the fourth quarter, compared with Rs 8,530crore in the last year quarter.
+                        '''
             return { "context" : context }
 
         def rag_search(state: State):
@@ -131,7 +136,7 @@ def main():
             retriever = vecstore.as_retriever(search_type="similarity", search_kwargs={"k": 6})
 
             # Define your query
-            query = "What are the benefits of Sovereign Gold Bonds compared to physical gold?"
+            query = "Which one offers better dividend yield – Coal India or ONGC?"
 
             # Search for relevant chunks
             retrieved_docs = vecstore.similarity_search(query, k=3)
@@ -181,7 +186,7 @@ def main():
         # if __name__ == "__main__":
             # Example question you want to test
         initial_state = {
-            "question": "Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?",
+            "question": "Which one offers better dividend yield – Coal India or ONGC?",
             "answer": "",
             "context": "",
             "summary": "",
@@ -197,7 +202,7 @@ def main():
         print(result.get("answer"))
 
         # llm2 = get_mistral_llm()
-        normal_answer = llm.invoke('Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?')
+        normal_answer = llm.invoke('Which one offers better dividend yield – Coal India or ONGC?')
         print("normal answer===========",normal_answer)
     except Exception as e:
         logger.exception("An error occurred")

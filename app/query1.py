@@ -31,7 +31,8 @@ from transformers import BitsAndBytesConfig
 from langchain_huggingface import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
-llm = get_mistral_llm()
+# llm = get_mistral_llm()
+llm = get_kimi()
 
 # RAG Setup: loaders, splitter, embeddings, vector store
 from langchain_community.document_loaders import PyPDFLoader
@@ -216,21 +217,6 @@ messages = [
                 }}
             }}
             ```
-        - **rag_search_tool**: Search the indexed document corpus (e.g., PDFs like "Gold ETF vs Physical Gold" and "Sovereign Gold Bond Scheme 2025–26") and return top-k relevant passages with source metadata.
-          **Inputs**:
-            - `query` (string): The natural language search query (e.g., "features of Sovereign Gold Bonds 2025-26").
-            - `k` (integer, optional, default=6): Number of top passages to return.
-            - `filters` (object, optional): Key-value pairs to filter results, e.g. `{{"source": "Sovereign Gold Bond Scheme 2025-26.pdf"}}`.
-          **Example Action**:
-            ```json
-            {{
-                "action": "rag_search_tool",
-                "action_input": {{
-                    "query": "What is the interest rate for Sovereign Gold Bonds 2025-26?",
-                    "k": 5
-                }}
-            }}
-            ```
 
         Valid "action" values: "Final Answer" or {tool_names}
 
@@ -336,7 +322,7 @@ my_callback_handler = CleanAgentStepCallbackHandler()
 
 response = executor.invoke({
     "input": "Should I invest in gold through Sovereign Gold Bonds or buy physical gold this year?",
-    "tool_names": ["query_decomposition_tool", "rag_search_tool"]
+    "tool_names": ["query_decomposition_tool"]
 },
 config = { "callbacks": [my_callback_handler] }
 )
