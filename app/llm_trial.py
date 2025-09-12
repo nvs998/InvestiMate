@@ -1,5 +1,6 @@
 import torch
 from transformers import BitsAndBytesConfig
+from transformers import Mxfp4Config
 from langchain_huggingface import HuggingFacePipeline
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
@@ -10,7 +11,9 @@ def get_mistral_llm():
     Loads mistralai/Mistral-7B-Instruct-v0.1 model and wraps it for LangChain usage.
     Uses 4-bit quantization for efficient memory usage (via bitsandbytes).
     """
-    model_id = "openai/gpt-oss-20b"
+    # model_id = 'mistralai/Mistral-7B-Instruct-v0.1'
+    # model_id = "unsloth/Kimi-K2-Base-BF16"
+    model_id = 'openai/gpt-oss-20b'
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
     if device == "cuda":
@@ -19,6 +22,7 @@ def get_mistral_llm():
     else:
         print("Using CPU device.")
 
+    quantization_config = Mxfp4Config()
     # 4-bit quantization configuration
     bnb_config = BitsAndBytesConfig(
         load_in_4bit=True,
@@ -35,7 +39,7 @@ def get_mistral_llm():
     model = AutoModelForCausalLM.from_pretrained(
         model_id,
         trust_remote_code=True,
-        quantization_config=bnb_config,
+        quantization_config=quantization_config,
         device_map="auto"
     )
 
