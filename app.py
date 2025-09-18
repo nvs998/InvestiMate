@@ -33,53 +33,41 @@ def main():
     # 3. Initialize core components
     llm = get_mistral_llm() # Load your LLM once
     rag_system = RAGSystem(llm=llm, pdf_paths=PDF_PATHS)
-    
-    
-    # --- PHASE 2: EXECUTION (Loop for Each Query) ---
-    
+
     all_results = []
     
-    print("\n--- Starting Dynamic Query Execution Loop ---")
-    # Loop from 1 to 10 (or however many query folders you have)
-    for query_num in range(1, 11):
+    print("\n--- Starting Query Execution Loop ---")
+    for i, query in enumerate(QUERIES):
+        print(f"\n--- Processing Query {i+1}/{len(QUERIES)}: {query} ---")
         
-        # Get the actual question text from our map
-        query_text = QUERIES.get(query_num)
-        if not query_text:
-            print(f"No question text found for query {query_num}, skipping.")
-            continue
-
-        print(f"\n--- Processing Query {query_num}/{len(QUERIES)}: {query_text} ---")
+        # Run the RAG Graph for the query
+        rag_result = rag_system.run_query(query)
         
-        # 1. Dynamically fetch the PDF paths for the current query
-        pdf_paths = get_pdf_paths(query_num)
+        # Generate a baseline "vanilla" answer for comparison
+        vanilla_answer = llm.invoke(query)
         
-        # 2. If no documents are found for this query, skip it
-        if not pdf_paths:
-            print(f"No PDFs found for query {query_num}, skipping.")
-            continue
-        
-        print(f"Found {len(pdf_paths)} documents: {pdf_paths}")
-        
-        # 3. Initialize a fresh RAGSystem for this specific query and its documents
-        #    This is the key change to ensure data isolation between queries.
-        rag_system = RAGSystem(llm=llm, pdf_paths=pdf_paths)
-        
-        # 4. Run the RAG Graph for the query
-        rag_result = rag_system.run_query(query_text)
-        
-        # 5. Generate a baseline "vanilla" answer for comparison
-        vanilla_answer = llm.invoke(query_text)
-        
-        # 6. Store the results
+        # Store the results
         all_results.append({
-            "question": query_text,
+            "question": query,
             "contexts": rag_result["context"],
             "answer_rag": rag_result["answer"],
             "answer_vanilla": vanilla_answer,
             "pointers": rag_result["pointers"]
         })
 
+    # --- PREPARE FOR PHASE 3: EVALUATION ---
+
+    # Convert results to a pandas DataFrame for easy viewing and saving
+    results_df = pd.DataFrame(all_results)
+    
+    print("\n\n--- All Queries Processed. Results: ---")
+    print(results_df.to_string())
+    
+    # Save results to a CSV file, ready for the RAGAs evaluation script
+    results_df.to_csv("rag_evaluation_data.csv", index=False)
+    print("\nResults saved to rag_evaluation_data.csv")
+    print("This file is now ready to be loaded for Phase 3: RAGAs Evaluation.")
+    
     # --- PREPARE FOR PHASE 3: EVALUATION ---
     if not all_results:
         print("No results were generated. Exiting.")

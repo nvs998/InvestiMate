@@ -12,6 +12,7 @@ import numpy as np
 from sklearn.manifold import TSNE
 import plotly.graph_objects as go
 
+from scripts import visualize_embeddings, visualize_embedding_model_performance
 
 # --- Queries to analyse ---
 QUERIES = {
@@ -41,31 +42,30 @@ def get_average_cosine_scores(model_id: str) -> list[float]:
     for query_num, query in QUERIES.items():
         pdf_paths = get_pdf_paths(query_num)
         print(f"Processing query: {query_num} with '{len(pdf_paths)}' documents.")
-        print(pdf_paths)
         docs = []
         for p in pdf_paths:
-            path = p  # Adjust path as necessary
-            print(f"Loading document: {path}, type: {type(path)}")
+            # Path to PDF file
+            path = p
             loader = PyPDFLoader(path)
             # Each page comes with metadata; loader returns Document objects
             docs.extend(loader.load())
 
-        # 2) Split into chunks (keep overlaps for context continuity)
+        # Split into chunks (keep overlaps for context continuity)
         splitter = RecursiveCharacterTextSplitter(
             chunk_size=500, chunk_overlap=150, separators=["\n\n", "\n", " ", ""]
         )
         splits = splitter.split_documents(docs)
 
-        # 3) Embeddings (no API key needed)
+        # Embeddings
         embeddings = HuggingFaceEmbeddings(
             model_name = model_id,
             encode_kwargs={"normalize_embeddings": True}
         )
 
-        # 4) Build FAISS index
+        # Build FAISS index
         vecstore = FAISS.from_documents(splits, embeddings)
 
-        # 5) Create a retriever (top_k configurable inside the tool)
+        # Create a retriever (top_5 configurable inside the tool)
         retriever = vecstore.as_retriever(search_type="similarity", search_kwargs={"k": 5})
 
         # Define your query
@@ -74,25 +74,21 @@ def get_average_cosine_scores(model_id: str) -> list[float]:
         # Search for relevant chunks
         retrieved_docs = vecstore.similarity_search(query, k=5)
 
-        # query = "What are the benefits of Sovereign Gold Bonds compared to physical gold?"
-
-        # Search for relevant chunks and get the documents
-        # retrieved_docs = vecstore.similarity_search(query, k=3)
-
         # Get the text content of the retrieved documents
         retrieved_texts = [doc.page_content for doc in retrieved_docs]
         context = "\n\n".join([doc.page_content for doc in retrieved_docs])
-        print(retrieved_texts)
-        print(len(retrieved_texts))
+        
         # Get the embeddings for both the query and the retrieved documents
         # This is the crucial step to fix the error.
         query_embedding = embeddings.embed_query(query)
         retrieved_embeddings = embeddings.embed_documents(retrieved_texts)
+        print(type(retrieved_embeddings), type(query_embedding))
+        # visualize_embeddings(query_embedding, retrieved_embeddings)
 
         # Convert embeddings to numpy arrays if they are not already
         query_embedding = np.array(query_embedding).reshape(1, -1)
         retrieved_embeddings = np.array(retrieved_embeddings)
-
+        print(type(retrieved_embeddings), type(query_embedding))
         # Now, combine the query embedding with the document embeddings
         all_embeddings = np.vstack([query_embedding, retrieved_embeddings])
 
@@ -103,46 +99,9 @@ def get_average_cosine_scores(model_id: str) -> list[float]:
         # Separate the reduced vectors for plotting
         query_vec_2d = reduced_vectors[0]
         doc_vecs_2d = reduced_vectors[1:]
-
-        # Create a list of labels for the plot
-        labels = ["Query"] + [f"Doc {i+1}" for i in range(len(doc_vecs_2d))]
-
-        # Visualize the results using Plotly for an interactive plot
-        fig = go.Figure()
-
-        # Add a trace for the query
-        fig.add_trace(go.Scatter(
-            x=[query_vec_2d[0]],
-            y=[query_vec_2d[1]],
-            mode='markers+text',
-            name='Query',
-            text=['Query'],
-            marker=dict(size=10, color='red'),
-            textposition="top center"
-        ))
-
-        # Add a trace for the retrieved documents
-        fig.add_trace(go.Scatter(
-            x=doc_vecs_2d[:, 0],
-            y=doc_vecs_2d[:, 1],
-            mode='markers+text',
-            name='Retrieved Chunks',
-            text=[f"Doc {i+1}" for i in range(len(doc_vecs_2d))],
-            marker=dict(size=8, color='blue'),
-            textposition="bottom center"
-        ))
-
-        # Update layout for a better visual
-        fig.update_layout(
-            title=f't-SNE Visualization of FAISS Search Results ({model_id})',
-            xaxis_title='t-SNE Dimension 1',
-            yaxis_title='t-SNE Dimension 2',
-            legend_title='Vectors',
-            width=700,  # Set the canvas width to 600 pixels
-            height=400  # Set the canvas height to 400 pixels   # Sets the y-axis tick step
-        )
-
-        fig.show()
+        # print("2D Query Vector:", type(query_vec_2d), query_vec_2d)
+        # print("2D Document Vectors:", type(doc_vecs_2d),doc_vecs_2d)
+        visualize_embeddings(query_vec_2d, doc_vecs_2d, model_id, query_num)
 
         # To get the scores, you can use similarity_search_with_score
         # retrieved_docs_with_scores = vecstore.similarity_search_with_score(query, k=5)
@@ -154,10 +113,6 @@ def get_average_cosine_scores(model_id: str) -> list[float]:
         #     print("FAISS L2 distance:", score)
         #     print("Cosine similarity:", cosine_sim)
         #     print()
-
-        # Assuming you have already generated these embeddings
-        query_embedding = np.array(query_embedding).reshape(1, -1)
-        retrieved_embeddings = np.array(retrieved_embeddings)
 
         # Reshape the query embedding to be a 1D vector for easier calculation
         query_vector = query_embedding[0]
@@ -218,6 +173,7 @@ if __name__ == "__main__":
     print("-" * 50)
     print("Final Summary of Average Cosine Scores:")
     average_scores = analyse_models()
+    visualize_embedding_model_performance(average_scores)
     for query, score in average_scores.items():
         print(f"  Model: '{query}'")
         print(f"  Average Score: {score:.4f}")

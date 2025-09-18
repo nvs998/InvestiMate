@@ -42,10 +42,7 @@ def get_llama3_llm():
         model=model,
         tokenizer=tokenizer,
         max_new_tokens=300,
-        do_sample=True,
-        temperature=0.3,
-        top_p=0.9,
-        repetition_penalty=1.1
+        do_sample=False,
     )
 
     # Wrap in LangChain LLM interface

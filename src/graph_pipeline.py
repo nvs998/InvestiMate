@@ -36,7 +36,7 @@ from langchain_core.language_models.llms import LLM
 from llm_models.mistral_wrapper import get_mistral_llm # Or your llama3 wrapper
 
 # --- State for Graph ---
-class RAGState(TypedDict):
+class State(TypedDict):
     question: str
     pointers: str
     context: list[str]
@@ -84,8 +84,37 @@ class RAGSystem:
         pointers = "1. Duration for which user plan to hold the investment?\n2. User's convenience and safety.\n3. Taxation.\n4. Costs and Charges"
         return {"pointers": pointers}
 
-    # --- NODE DEFINITIONS ---
-    # These are now methods of the class. They operate on the state.
+    def _compile_graph(self):
+        """
+        Compiles the LangGraph structure.
+        """
+        builder = StateGraph(State)
+        
+        builder.add_node("query_decomposition_tool", self.query_decomposition_tool)
+        builder.add_node("rag_search", self.rag_search)
+        builder.add_node("generate_answer", self.call_model)
+        
+        builder.add_edge(START, "query_decomposition_tool")
+        builder.add_edge("query_decomposition_tool", "rag_search")
+        builder.add_edge("rag_search", "generate_answer")
+        builder.add_edge("generate_answer", END)
+        
+        # Using an in-memory checkpointer for simplicity
+        memory = InMemorySaver()
+        return builder.compile(checkpointer=memory)
+
+    def run_query(self, question: str) -> dict:
+        """
+        Executes the graph for a single query.
+        """
+        thread_id = str(uuid.uuid4())
+        initial_state = {"question": question}
+        
+        # The config is essential for the checkpointer to work correctly
+        config = {"configurable": {"thread_id": thread_id}}
+        
+        final_state = self.graph.invoke(initial_state, config=config)
+        return final_state
 
 def main():
     logger.info("Starting program")
